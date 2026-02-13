@@ -10,28 +10,28 @@ config:
 ---
 graph TD
     subgraph Internet["☁️ Internet Edge"]
-        CF["**CloudFront**\n(CDN / Edge Distribution)"]
+        CF["**CloudFront**<br/>(CDN / Edge Distribution)"]
     end
 
     subgraph AWSEdge["🛡️ AWS Perimeter Security"]
-        WAF["**AWS WAF**\n(Web Application Firewall)\nRate Limiting · IP Filtering\nManaged Rule Sets"]
+        WAF["**AWS WAF**<br/>(Web Application Firewall)<br/>Rate Limiting · IP Filtering<br/>Managed Rule Sets"]
     end
 
     subgraph AWSNetwork["⚖️ AWS Network Layer"]
-        NLB["**NLB**\n(Network Load Balancer)\nL4 TCP/TLS Termination"]
+        NLB["**NLB**<br/>(Network Load Balancer)<br/>L4 TCP/TLS Termination"]
     end
 
     subgraph GlooLayer["🌐 Gloo Mesh / API Gateway"]
-        GProxy["**Gloo Gateway Proxy**\n(Envoy-based Ingress)\nRouting · TLS · Auth"]
-        GWAF["**Gloo WAF**\n(ModSecurity / OWASP)\nL7 Inspection · CRS Rules"]
+        GProxy["**Gloo Gateway Proxy**<br/>(Envoy-based Ingress)<br/>Routing · TLS · Auth"]
+        GWAF["**Gloo WAF**<br/>(ModSecurity / OWASP)<br/>L7 Inspection · CRS Rules"]
     end
 
     subgraph K8sSecurity["🔒 Kubernetes Network Security"]
-        SG["**Security Group**\n(ENI-level Firewall)\nPort & Protocol Filtering"]
+        SG["**Security Group**<br/>(ENI-level Firewall)<br/>Port & Protocol Filtering"]
     end
 
     subgraph K8sWorkload["📦 Kubernetes Workload"]
-        POD["**Kubernetes Pod**\n(Application Container)"]
+        POD["**Kubernetes Pod**<br/>(Application Container)"]
     end
 
     CF -->|"HTTPS Request"| WAF
