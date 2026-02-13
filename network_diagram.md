@@ -1,6 +1,14 @@
 # Network Diagram - Generic
 ```mermaid
-graph LR
+---
+config:
+  theme: default
+  flowchart:
+    nodeSpacing: 60
+    rankSpacing: 80
+    padding: 30
+---
+graph TD
     subgraph Internet["☁️ Internet Edge"]
         CF["**CloudFront**\n(CDN / Edge Distribution)"]
     end
