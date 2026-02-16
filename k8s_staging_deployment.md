@@ -1,14 +1,14 @@
 # Core Backend - EKS Staging Deployment Diagram
 
 ```mermaid
-%%| init: { "scale": 2 } |%%
 ---
 config:
   theme: default
   flowchart:
-    nodeSpacing: 50
-    rankSpacing: 70
-    padding: 25
+    nodeSpacing: 80
+    rankSpacing: 100
+    padding: 40
+    defaultRenderer: elk
 ---
 graph TD
     %% ═══════════════════════════════════════
