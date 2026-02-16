@@ -1,6 +1,7 @@
 # Core Backend - EKS Staging Deployment Diagram
 
 ```mermaid
+%%| init: { "scale": 2 } |%%
 ---
 config:
   theme: default
