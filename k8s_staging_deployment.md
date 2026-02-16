@@ -74,22 +74,22 @@ graph TD
         end
 
         subgraph NODE2["Sidekiq"]
-            N2_SK15(["**sidekiq-15s** 1/3<br/>Queue: latency_15s"])
-            N2_SK15(["**sidekiq-15s** 2/3<br/>Queue: latency_15s"])
-            N2_SK15(["**sidekiq-15s** 3/3<br/>Queue: latency_15s"])
-            N2_SK5M(["**sidekiq-5m** 1/2<br/>Queue: latency_5m"])
-            N2_SK5M(["**sidekiq-5m** 2/2<br/>Queue: latency_5m"])
-            N2_SK1H(["**sidekiq-1h** 1/1<br/>Queue: latency_1h"])
-            N2_SK5H(["**sidekiq-5h** 1/1<br/>Queue: latency_5h"])
+            N2_SK15_1(["**sidekiq-15s** 1/3<br/>Queue: latency_15s"])
+            N2_SK15_2(["**sidekiq-15s** 2/3<br/>Queue: latency_15s"])
+            N2_SK15_3(["**sidekiq-15s** 3/3<br/>Queue: latency_15s"])
+            N2_SK5M_1(["**sidekiq-5m** 1/2<br/>Queue: latency_5m"])
+            N2_SK5M_2(["**sidekiq-5m** 2/2<br/>Queue: latency_5m"])
+            N2_SK1H_1(["**sidekiq-1h** 1/1<br/>Queue: latency_1h"])
+            N2_SK5H_1(["**sidekiq-5h** 1/1<br/>Queue: latency_5h"])
         end
 
         subgraph NODE3["Worker"]
-            N3_WORKER(["**worker** 1/1<br/>rake jobs:work"])
+            N3_WORKER_1(["**worker** 1/1<br/>rake jobs:work"])
         end
 
         subgraph NODE4["Hutch"]
-            N4_HUTCH(["**hutch** 1/2<br/>RabbitMQ Consumer"])
-            N4_HUTCH(["**hutch** 2/2<br/>RabbitMQ Consumer"])
+            N4_HUTCH_1(["**hutch** 1/2<br/>RabbitMQ Consumer"])
+            N4_HUTCH_2(["**hutch** 2/2<br/>RabbitMQ Consumer"])
         end
 
         MIGRATE["**Job: db-migrate**<br/>ArgoCD Sync Hook<br/>rails db:migrate<br/>backoffLimit: 3"]
@@ -101,10 +101,10 @@ graph TD
     classDef workerPod fill:#ad1457,stroke:#880e4f,color:#fff,stroke-width:2px
     classDef migration fill:#546e7a,stroke:#37474f,color:#fff,stroke-width:2px
 
-    class N1_APP,N2_APP,N3_APP,N4_APP,N5_APP appPod
-    class N1_SK15,N2_SK15,N3_SK15,N2_SK5M,N4_SK5M,N4_SK1H,N5_SK5H sidekiqPod
-    class N1_HUTCH,N5_HUTCH hutchPod
-    class N3_WORKER workerPod
+    class N1_APP_1,N1_APP_2,N1_APP_3,N1_APP_4,N1_APP_5 appPod
+    class N2_SK15_1,N2_SK15_2,N2_SK15_3,N2_SK5M_1,N2_SK5M_2,N2_SK1H_1,N2_SK5H_1 sidekiqPod
+    class N4_HUTCH_1,N4_HUTCH_2 hutchPod
+    class N3_WORKER_1 workerPod
     class MIGRATE migration
 ```
 
