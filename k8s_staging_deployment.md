@@ -4,11 +4,14 @@
 ---
 config:
   theme: default
+  themeVariables:
+    fontSize: 20px
   flowchart:
-    nodeSpacing: 80
-    rankSpacing: 100
-    padding: 40
+    nodeSpacing: 160
+    rankSpacing: 200
+    padding: 80
     defaultRenderer: elk
+    wrappingWidth: 300
 ---
 graph TD
     %% ═══════════════════════════════════════
