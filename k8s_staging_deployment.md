@@ -25,8 +25,6 @@ graph TD
         VS_HUB["**hub2.yardstik-staging.com**<br/>(hub2-staging)<br/>WAF: ModSecurity + CRS"]
     end
 
-    VS_API & VS_ADMIN & VS_HUB -->|"upstream:<br/>staging-core-backend-3000"| LB
-
     LB["Upstream Router<br/>core-backend :3000"]
 
     LB --> N1_APP & N2_APP & N3_APP & N4_APP & N5_APP
