@@ -66,11 +66,11 @@ graph TD
     subgraph CLUSTER["EKS Staging Cluster - Namespace: staging"]
 
         subgraph NODE1["Puma"]
-            N1_APP(["**core-backend** 1/5<br/>Puma :3000"])
-            N1_APP(["**core-backend** 2/5<br/>Puma :3000"])
-            N1_APP(["**core-backend** 3/5<br/>Puma :3000"])
-            N1_APP(["**core-backend** 4/5<br/>Puma :3000"])
-            N1_APP(["**core-backend** 5/5<br/>Puma :3000"])
+            N1_APP_1(["**core-backend** 1/5<br/>Puma :3000"])
+            N1_APP_2(["**core-backend** 2/5<br/>Puma :3000"])
+            N1_APP_3(["**core-backend** 3/5<br/>Puma :3000"])
+            N1_APP_4(["**core-backend** 4/5<br/>Puma :3000"])
+            N1_APP_5(["**core-backend** 5/5<br/>Puma :3000"])
         end
 
         subgraph NODE2["Sidekiq"]
