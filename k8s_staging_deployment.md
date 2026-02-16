@@ -65,34 +65,31 @@ config:
 graph TD
     subgraph CLUSTER["EKS Staging Cluster - Namespace: staging"]
 
-        subgraph NODE1["Node 1"]
+        subgraph NODE1["Puma"]
             N1_APP(["**core-backend** 1/5<br/>Puma :3000"])
-            N1_SK15(["**sidekiq-15s** 1/3<br/>Queue: latency_15s"])
-            N1_HUTCH(["**hutch** 1/2<br/>RabbitMQ Consumer"])
+            N1_APP(["**core-backend** 2/5<br/>Puma :3000"])
+            N1_APP(["**core-backend** 3/5<br/>Puma :3000"])
+            N1_APP(["**core-backend** 4/5<br/>Puma :3000"])
+            N1_APP(["**core-backend** 5/5<br/>Puma :3000"])
         end
 
-        subgraph NODE2["Node 2"]
-            N2_APP(["**core-backend** 2/5<br/>Puma :3000"])
+        subgraph NODE2["Sidekiq"]
+            N2_SK15(["**sidekiq-15s** 1/3<br/>Queue: latency_15s"])
             N2_SK15(["**sidekiq-15s** 2/3<br/>Queue: latency_15s"])
+            N2_SK15(["**sidekiq-15s** 3/3<br/>Queue: latency_15s"])
             N2_SK5M(["**sidekiq-5m** 1/2<br/>Queue: latency_5m"])
+            N2_SK5M(["**sidekiq-5m** 2/2<br/>Queue: latency_5m"])
+            N2_SK1H(["**sidekiq-1h** 1/1<br/>Queue: latency_1h"])
+            N2_SK5H(["**sidekiq-5h** 1/1<br/>Queue: latency_5h"])
         end
 
-        subgraph NODE3["Node 3"]
-            N3_APP(["**core-backend** 3/5<br/>Puma :3000"])
-            N3_SK15(["**sidekiq-15s** 3/3<br/>Queue: latency_15s"])
+        subgraph NODE3["Worker"]
             N3_WORKER(["**worker** 1/1<br/>rake jobs:work"])
         end
 
-        subgraph NODE4["Node 4"]
-            N4_APP(["**core-backend** 4/5<br/>Puma :3000"])
-            N4_SK5M(["**sidekiq-5m** 2/2<br/>Queue: latency_5m"])
-            N4_SK1H(["**sidekiq-1h** 1/1<br/>Queue: latency_1h"])
-        end
-
-        subgraph NODE5["Node 5"]
-            N5_APP(["**core-backend** 5/5<br/>Puma :3000"])
-            N5_HUTCH(["**hutch** 2/2<br/>RabbitMQ Consumer"])
-            N5_SK5H(["**sidekiq-5h** 1/1<br/>Queue: latency_5h"])
+        subgraph NODE4["Hutch"]
+            N4_HUTCH(["**hutch** 1/2<br/>RabbitMQ Consumer"])
+            N4_HUTCH(["**hutch** 2/2<br/>RabbitMQ Consumer"])
         end
 
         MIGRATE["**Job: db-migrate**<br/>ArgoCD Sync Hook<br/>rails db:migrate<br/>backoffLimit: 3"]
