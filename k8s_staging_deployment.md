@@ -1,22 +1,24 @@
 # Core Backend - EKS Staging Deployment Diagram
 
+> **Image:** `core.backend:v1.903.0` | **Namespace:** `staging` | **7 Deployments / 15 Pods**
+
+---
+
+## Network Flow
+
 ```mermaid
 ---
 config:
   theme: default
   themeVariables:
-    fontSize: 20px
+    fontSize: 18px
   flowchart:
-    nodeSpacing: 160
-    rankSpacing: 200
-    padding: 80
+    nodeSpacing: 80
+    rankSpacing: 80
+    padding: 40
     defaultRenderer: elk
-    wrappingWidth: 300
 ---
 graph TD
-    %% ═══════════════════════════════════════
-    %% INGRESS - Gloo VirtualServices
-    %% ═══════════════════════════════════════
     subgraph INGRESS["Gloo VirtualServices - HTTPS Ingress"]
         VS_API["**api.yardstik-staging.com**<br/>(core-backend-staging)<br/>Routes: / , /vite, /bullhorn, /twilio"]
         VS_ADMIN["**admin.yardstik-staging.com**<br/>(active-admin-staging)"]
@@ -27,12 +29,44 @@ graph TD
 
     LB["Upstream Router<br/>core-backend :3000"]
 
-    %% ═══════════════════════════════════════
-    %% EKS CLUSTER
-    %% ═══════════════════════════════════════
-    subgraph CLUSTER["EKS Staging Cluster - Namespace: staging - Image: core.backend:v1.903.0 - 7 Deployments / 15 Pods"]
+    LB --> N1_APP & N2_APP & N3_APP & N4_APP & N5_APP
 
-        %% ── Nodes with Pod Distribution ──
+    subgraph CLUSTER["EKS Staging Cluster"]
+        N1_APP(["**core-backend** 1/5<br/>Puma :3000 - Node 1"])
+        N2_APP(["**core-backend** 2/5<br/>Puma :3000 - Node 2"])
+        N3_APP(["**core-backend** 3/5<br/>Puma :3000 - Node 3"])
+        N4_APP(["**core-backend** 4/5<br/>Puma :3000 - Node 4"])
+        N5_APP(["**core-backend** 5/5<br/>Puma :3000 - Node 5"])
+    end
+
+    classDef ingress fill:#1565c0,stroke:#0d47a1,color:#fff,stroke-width:2px
+    classDef upstream fill:#00897b,stroke:#004d40,color:#fff,stroke-width:2px
+    classDef appPod fill:#2e7d32,stroke:#1b5e20,color:#fff,stroke-width:2px
+
+    class VS_API,VS_ADMIN,VS_HUB ingress
+    class LB upstream
+    class N1_APP,N2_APP,N3_APP,N4_APP,N5_APP appPod
+```
+
+---
+
+## Deployments & Pod Distribution
+
+```mermaid
+---
+config:
+  theme: default
+  themeVariables:
+    fontSize: 18px
+  flowchart:
+    nodeSpacing: 60
+    rankSpacing: 60
+    padding: 40
+    defaultRenderer: elk
+---
+graph TD
+    subgraph CLUSTER["EKS Staging Cluster - Namespace: staging"]
+
         subgraph NODE1["Node 1"]
             N1_APP(["**core-backend** 1/5<br/>Puma :3000"])
             N1_SK15(["**sidekiq-15s** 1/3<br/>Queue: latency_15s"])
@@ -63,71 +97,23 @@ graph TD
             N5_SK5H(["**sidekiq-5h** 1/1<br/>Queue: latency_5h"])
         end
 
-        %% ── ArgoCD Sync Hook ──
         MIGRATE["**Job: db-migrate**<br/>ArgoCD Sync Hook<br/>rails db:migrate<br/>backoffLimit: 3"]
-
-        %% ── CronJobs ──
-        subgraph CRONJOBS["CronJobs - Transient Pods - concurrencyPolicy: Forbid - restartPolicy: Never"]
-
-            subgraph HIGH_FREQ["Every 10-30 min"]
-                CJ1{{"**activate-subaccounts**<br/>*/10 * * * *<br/>sub_account:activate"}}
-                CJ2{{"**adverse-emails**<br/>*/30 * * * *<br/>adverse_actions:adverse_emails"}}
-            end
-
-            subgraph DAILY["Daily Schedule"]
-                CJ3{{"**archive-reports**<br/>4:00 AM"}}
-                CJ4{{"**contact-verify-expire**<br/>6:00 AM"}}
-                CJ5{{"**contact-verify-reminder**<br/>4:00 PM"}}
-                CJ6{{"**import-cleanup**<br/>5:10 AM"}}
-                CJ7{{"**info-request-expire**<br/>Midnight"}}
-                CJ8{{"**invitations-expire**<br/>5:00 AM"}}
-                CJ9{{"**logs-delete-stale**<br/>Midnight"}}
-                CJ10{{"**info-request-reminder**<br/>3:00 PM"}}
-                CJ11{{"**send-reminder-email**<br/>2:00 PM"}}
-            end
-
-            subgraph MONTHLY["Monthly Schedule"]
-                CJ12{{"**cm-transactions**<br/>1st @ 6:00 AM"}}
-                CJ13{{"**cm-cleanup-alert**<br/>15th @ 10:00 AM"}}
-            end
-        end
     end
 
-    %% ═══════════════════════════════════════
-    %% CONNECTIONS
-    %% ═══════════════════════════════════════
-
-    %% Traffic routing to app pods
-    LB --> N1_APP & N2_APP & N3_APP & N4_APP & N5_APP
-
-    %% CronJobs spawn transient pods on any node
-    CRONJOBS -.->|"Job Controller creates Pod<br/>on any available node"| NODE1
-    CRONJOBS -.->|"Pod scheduled<br/>on any node"| NODE3
-    CRONJOBS -.->|"Pod scheduled<br/>on any node"| NODE5
-
-    %% ═══════════════════════════════════════
-    %% STYLING
-    %% ═══════════════════════════════════════
-    classDef ingress fill:#1565c0,stroke:#0d47a1,color:#fff,stroke-width:2px
-    classDef upstream fill:#00897b,stroke:#004d40,color:#fff,stroke-width:2px
     classDef appPod fill:#2e7d32,stroke:#1b5e20,color:#fff,stroke-width:2px
     classDef sidekiqPod fill:#6a1b9a,stroke:#4a148c,color:#fff,stroke-width:2px
     classDef hutchPod fill:#e65100,stroke:#bf360c,color:#fff,stroke-width:2px
     classDef workerPod fill:#ad1457,stroke:#880e4f,color:#fff,stroke-width:2px
-    classDef cronJob fill:#f9a825,stroke:#f57f17,color:#000,stroke-width:2px
     classDef migration fill:#546e7a,stroke:#37474f,color:#fff,stroke-width:2px
 
-    class VS_API,VS_ADMIN,VS_HUB ingress
-    class LB upstream
     class N1_APP,N2_APP,N3_APP,N4_APP,N5_APP appPod
     class N1_SK15,N2_SK15,N3_SK15,N2_SK5M,N4_SK5M,N4_SK1H,N5_SK5H sidekiqPod
     class N1_HUTCH,N5_HUTCH hutchPod
     class N3_WORKER workerPod
-    class CJ1,CJ2,CJ3,CJ4,CJ5,CJ6,CJ7,CJ8,CJ9,CJ10,CJ11,CJ12,CJ13 cronJob
     class MIGRATE migration
 ```
 
-## Deployment Summary
+### Deployment Summary
 
 | Deployment | Replicas | Command | Resources |
 |---|---|---|---|
@@ -142,7 +128,53 @@ graph TD
 
 All deployments use `initContainer` to run `rake db:abort_if_pending_migrations` before starting.
 
-## CronJob Schedule
+---
+
+## CronJobs
+
+```mermaid
+---
+config:
+  theme: default
+  themeVariables:
+    fontSize: 18px
+  flowchart:
+    nodeSpacing: 60
+    rankSpacing: 60
+    padding: 40
+    defaultRenderer: elk
+---
+graph TD
+    subgraph CRONJOBS["CronJobs - Transient Pods - concurrencyPolicy: Forbid - restartPolicy: Never"]
+
+        subgraph HIGH_FREQ["Every 10-30 min"]
+            CJ1{{"**activate-subaccounts**<br/>*/10 * * * *<br/>sub_account:activate"}}
+            CJ2{{"**adverse-emails**<br/>*/30 * * * *<br/>adverse_actions:adverse_emails"}}
+        end
+
+        subgraph DAILY["Daily Schedule"]
+            CJ3{{"**archive-reports**<br/>4:00 AM"}}
+            CJ4{{"**contact-verify-expire**<br/>6:00 AM"}}
+            CJ5{{"**contact-verify-reminder**<br/>4:00 PM"}}
+            CJ6{{"**import-cleanup**<br/>5:10 AM"}}
+            CJ7{{"**info-request-expire**<br/>Midnight"}}
+            CJ8{{"**invitations-expire**<br/>5:00 AM"}}
+            CJ9{{"**logs-delete-stale**<br/>Midnight"}}
+            CJ10{{"**info-request-reminder**<br/>3:00 PM"}}
+            CJ11{{"**send-reminder-email**<br/>2:00 PM"}}
+        end
+
+        subgraph MONTHLY["Monthly Schedule"]
+            CJ12{{"**cm-transactions**<br/>1st @ 6:00 AM"}}
+            CJ13{{"**cm-cleanup-alert**<br/>15th @ 10:00 AM"}}
+        end
+    end
+
+    classDef cronJob fill:#f9a825,stroke:#f57f17,color:#000,stroke-width:2px
+    class CJ1,CJ2,CJ3,CJ4,CJ5,CJ6,CJ7,CJ8,CJ9,CJ10,CJ11,CJ12,CJ13 cronJob
+```
+
+### CronJob Schedule
 
 | CronJob | Schedule | Rake Task |
 |---|---|---|
