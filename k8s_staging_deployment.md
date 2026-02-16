@@ -145,7 +145,7 @@ config:
     defaultRenderer: elk
 ---
 graph TD
-    subgraph CRONJOBS["CronJobs - Transient Pods - concurrencyPolicy: Forbid - restartPolicy: Never"]
+    subgraph CRONJOBS["CronJobs & Pods - concurrencyPolicy: Forbid - restartPolicy: Never"]
 
         subgraph HIGH_FREQ["Every 10-30 min"]
             CJ1{{"**activate-subaccounts**<br/>*/10 * * * *<br/>sub_account:activate"}}
