@@ -1,6 +1,6 @@
 # core.backend - Staging Deployment
 
-> **Namespace:** `staging` | **Cluster:** `eks-staging` | **Image:** `v1.935.2` | **Service Account:** `yardstik-staging`
+> **Namespace:** `staging` | **Cluster:** `eks-staging` | **Service Account:** `yardstik-staging` | **Created:** `02/17/2026`
 
 ---
 
@@ -10,22 +10,14 @@ All virtual services use **Gloo Gateway** with TLS v1.2 minimum and the `star.ya
 
 ### Virtual Service Summary
 
-| Domain | Path | Match Type | Upstream | Timeout | Retries | Per-Try Timeout | Retry On | Notable Options |
-|--------|------|------------|----------|---------|---------|-----------------|----------|-----------------|
-| `api.yardstik-staging.com` | `/twilio/voice/reply` | Prefix | _(direct response 200)_ | - | - | - | - | Returns XML voice response |
-| `api.yardstik-staging.com` | `/vite` | Prefix | `staging-core-backend-3000` | - | - | - | - | `Cache-Control: max-age=31536000, immutable` |
-| `api.yardstik-staging.com` | `/bullhorn/{hash}/tab` | Regex | `staging-core-backend-3000` | - | - | - | - | CSP with `frame-ancestors bullhornstaffing.com` |
-| `api.yardstik-staging.com` | `/` | Prefix | `staging-core-backend-3000` | 60s | 3 | 10s | connect-failure, refused-stream, reset | HSTS, removes `server` header |
-| `hub2.yardstik-staging.com` | `/` | Prefix | `staging-core-backend-3000` | 60s | 3 | 10s | cancelled, reset, unavailable, gateway-error, connect-failure, refused-stream, retriable-status-codes | CORS enabled, WAF (Log4j CVE, CloudFront header checks), CSP |
-| `admin.yardstik-staging.com` | `/` | Prefix | `staging-core-backend-3000` | 120s | 2 | 60s | connect-failure, refused-stream, reset | CSP, X-Frame-Options SAMEORIGIN |
-
-### Response Headers Applied
-
-| Domain | Cache-Control | HSTS | CSP | X-Frame-Options | CORS | WAF |
-|--------|--------------|------|-----|-----------------|------|-----|
-| `api.yardstik-staging.com` | no-cache, no-store | 63072000s | - | - | Methods only | - |
-| `hub2.yardstik-staging.com` | no-cache, no-store | 63072000s | Yes (self, https, wss, data, blob) | SAMEORIGIN | Full (credentials, origins, regex) | ModSecurity CRS + custom rules |
-| `admin.yardstik-staging.com` | no-cache, no-store | 63072000s | Yes (self, https, wss, data) | SAMEORIGIN | Methods + Origin | - |
+| Domain | Path | Upstream | Timeout | Retries | Per-Try Timeout | Retry On | Notable Options |
+|--------|------|----------|---------|---------|-----------------|----------|-----------------|
+| `api.yardstik-staging.com` | `/twilio/voice/reply` | _(direct response 200)_ | - | - | - | - | Returns XML voice response |
+| `api.yardstik-staging.com` | `/vite` | `staging-core-backend-3000` | - | - | - | - | `Cache-Control: max-age=31536000, immutable` |
+| `api.yardstik-staging.com` | `/bullhorn/{hash}/tab` | `staging-core-backend-3000` | - | - | - | - | CSP with `frame-ancestors bullhornstaffing.com` |
+| `api.yardstik-staging.com` | `/` | `staging-core-backend-3000` | 60s | 3 | 10s | connect-failure, refused-stream, reset | HSTS, removes `server` header |
+| `hub2.yardstik-staging.com` | `/` | `staging-core-backend-3000` | 60s | 3 | 10s | cancelled, reset, unavailable, gateway-error, connect-failure, refused-stream, retriable-status-codes | CORS enabled, WAF (Log4j CVE, CloudFront header checks), CSP |
+| `admin.yardstik-staging.com` | `/` | `staging-core-backend-3000` | 120s | 2 | 60s | connect-failure, refused-stream, reset | CSP, X-Frame-Options SAMEORIGIN |
 
 ### Network Diagram
 
@@ -47,7 +39,7 @@ graph LR
 
     subgraph "Namespace: staging"
         SVC["Service<br/>core-backend:3000"]
-        subgraph "Deployment: core-backend (5 replicas)"
+        subgraph "Deployment: 5 replicas"
             P1[Pod 1]
             P2[Pod 2]
             P3[Pod 3]
