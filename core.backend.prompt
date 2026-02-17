@@ -1,0 +1,13 @@
+Create a README.md file that documents the deployment details of the core.backend service in  /Users/sky.lukas/Repos/yardstik/ops.k8s-staging/core.backend
+Read all the manifests and summarize the importand parts into the following three sections.  Create a table summary and a mermaid chart for each section.
+Section 1. Network
+* In the table show DNS, Paths and Header details. Include options and timeouts.
+* In the mermaid diagram show Virtual Service > Upstream > Deployment > Pods
+Section 2. Deployment and Pods
+* In the table summarize deployments, showing Name, Replicas, Commands, Resources, health probes and init containers
+* In the diagram show Service Core.Backend > Deployment > Pods showing they run in an EKS cluster called eks-staging.
+Section 3. Cronjobs
+* In the table summarize the various cron jobs and ephemeral jobs. Show CronJob Name, Schedule, Human readable schedule, and the command run
+* In the diagram break down by jobs that run monthly, daily and periodic (hour/minute/etc). Include human readable times.
+* Use US Central time for all human readable times.
+
